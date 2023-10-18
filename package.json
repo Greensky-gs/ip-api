@@ -1,0 +1,12 @@
+{
+  "name": "ip-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.5.1",
+    "express": "^4.18.2",
+    "tsc": "^2.0.4",
+    "typescript": "^5.2.2"
+  }
+}
