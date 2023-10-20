@@ -19,10 +19,14 @@
 		"uuid": "^9.0.1"
 	},
 	"scripts": {
-		"build": "yarn tsc -b",
-		"launch": "yarn install && yarn build && node dist/index.js"
+		"build": "yarn clean && yarn tsc -b && yarn copy-files",
+		"launch": "yarn install && yarn build && node dist/index.js",
+		"clean": "rimraf dist/",
+		"copy-files": "copyfiles -u 1 src/contents/*.* dist"
 	},
 	"devDependencies": {
-		"@types/sequelize": "^4.28.17"
+		"@types/sequelize": "^4.28.17",
+		"copyfiles": "^2.4.1",
+		"rimraf": "^5.0.5"
 	}
 }
