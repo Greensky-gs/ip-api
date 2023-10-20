@@ -3,6 +3,7 @@ import { config } from 'dotenv';
 import { writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { v4 as uuid } from 'uuid';
 import requestIp from 'request-ip'
+import {} from './db/index'
 config()
 
 const logDir = (x?: string) => `./dist/logs${x ? `/${x}` : ''}`
