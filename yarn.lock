@@ -69,6 +69,13 @@
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.6.tgz#7cb33992049fd7340d5b10c0098e104184dfcd2a"
   integrity sha512-+0autS93xyXizIYiyL02FCY8N+KkKPhILhcUSA276HxzreZ16kl+cmwvV2qAM/PuCCwPXzOXOWhiPcw20uSFcA==
 
+"@types/request-ip@^0.0.40":
+  version "0.0.40"
+  resolved "https://registry.yarnpkg.com/@types/request-ip/-/request-ip-0.0.40.tgz#b7eb7785bcf2f1c1fdd7ebdb4fbc7a5b6f258ef4"
+  integrity sha512-3pBKLRLlE5YwVWp2hQRqv6dOXWkoE3bEt+EXHTVd8Q3XNnIWFJx+VC2Dy8+DAnBI9MmSqHSljUZPeuTBMvsNYg==
+  dependencies:
+    "@types/node" "*"
+
 "@types/send@*":
   version "0.17.3"
   resolved "https://registry.yarnpkg.com/@types/send/-/send-0.17.3.tgz#81b2ea5a3a18aad357405af2d643ccbe5a09020b"
@@ -460,6 +467,11 @@ raw-body@2.5.1:
     http-errors "2.0.0"
     iconv-lite "0.4.24"
     unpipe "1.0.0"
+
+request-ip@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/request-ip/-/request-ip-3.3.0.tgz#863451e8fec03847d44f223e30a5d63e369fa611"
+  integrity sha512-cA6Xh6e0fDBBBwH77SLJaJPBmD3nWVAcF9/XAcsrIHdjhFzFiB5aNQFytdjCGPezU3ROwrR11IddKAM08vohxA==
 
 safe-buffer@5.2.1:
   version "5.2.1"
