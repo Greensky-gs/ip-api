@@ -6,10 +6,11 @@ export const sequelize = new Sequelize({
     username: process.env.user,
     database: process.env.database,
     password: process.env.password,
-    host: process.env.host
+    host: process.env.host,
+    logging: false
 })
 
-sequelize.sync({ alter: true, logging: false });
+sequelize.sync({ alter: true });
 
 readdirSync(`./dist/db/models`).forEach((fileName) => {
     require(`./models/${fileName}`)

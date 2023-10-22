@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "..";
+import { PermLevel } from "../../types/core";
 
 const users = sequelize.define('users', {
     id: {
@@ -14,6 +15,11 @@ const users = sequelize.define('users', {
     password: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    perm: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: PermLevel.Visitor
     }
 })
 
