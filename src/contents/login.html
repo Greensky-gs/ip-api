@@ -30,9 +30,6 @@
             url.searchParams.set('u', username)
             url.searchParams.set('p', password)
 
-            console.log(url)
-            console.dir(url)
-
             fetch(url, {
                 method: 'POST'
             }).then((res) => {

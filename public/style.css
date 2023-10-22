@@ -1,10 +1,11 @@
 button {
     background-color: inherit;
     border-radius: 5px;
-    border: 1.5px black solid;
+    border: 1.5px white solid;
+    color: white;
 }
 button:focus, button:selection, button:hover {
-    border: 1.5px black solid;
+    border: 1.5px white solid;
 }
 
 * {
@@ -13,4 +14,21 @@ button:focus, button:selection, button:hover {
 
 body {
     background-color: #20466C;
+    color: white;
+}
+a {
+    color: inherit;
+    text-decoration: none;
+}
+a:visited {
+    color: inherit;
+    text-decoration: none;
+}
+.rootbuttons {
+    border: 1.5px black solid;
+    padding: 3px;
+    color: black;
+}
+.rootbuttons:hover {
+    cursor: pointer;
 }

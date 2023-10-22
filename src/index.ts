@@ -2,23 +2,25 @@ import express from "express";
 import { config } from "dotenv";
 config();
 
-import { writeFileSync, existsSync, mkdirSync } from "node:fs";
+import { writeFileSync, existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
 import { v4 as uuid } from "uuid";
 import requestIp from "request-ip";
 import users from "./cache/users";
 import { accessLevel, sendFile, sendWebhook } from "./utils/toolbox";
 import allows from "./cache/allows";
-import cors from 'cors';
+import cors from "cors";
 
 const logDir = (x?: string) => `./dist/logs${x ? `/${x}` : ""}`;
 if (!existsSync(logDir())) mkdirSync(logDir());
 
 const app = express();
 
-app.use(cors({
-    origin: `http://127.0.0.1:${process.env.port}`,
-    optionsSuccessStatus: 200
-}))
+app.use(
+	cors({
+		origin: `http://127.0.0.1:${process.env.port}`,
+		optionsSuccessStatus: 200,
+	})
+);
 app.use(requestIp.mw());
 app.use(express.static("public"));
 
@@ -43,6 +45,7 @@ app.get("/img.png", (req, res) => {
 				query: req.query,
 				clientIp: req.clientIp,
 				calculatedClientIp: requestIp.getClientIp(req),
+				date: Date.now()
 			},
 			null,
 			1
@@ -59,10 +62,10 @@ app.get("/login", (req, res) => {
 	sendFile(res, "login");
 });
 app.all("/enter", (req, res) => {
-	const domain = 'http://' + req.headers.host
+	const domain = "http://" + req.headers.host;
 	const params = new URL(`${domain}${req.url}`).searchParams;
-	const username = params.get('u');
-	const password = params.get('p');
+	const username = params.get("u");
+	const password = params.get("p");
 
 	const user = users.getUserByName(username);
 	if (!user || !users.match(user?.id, password))
@@ -75,9 +78,42 @@ app.all("/enter", (req, res) => {
 
 	return res.redirect(`${domain}/dashboard`);
 });
-app.get('/dashboard', (req, res) => {
+app.get("/dashboard", (req, res) => {
+	const user = allows.getAllow(req.clientIp);
+	if (!user || !user.allowed) return sendFile(res, "unallowed");
+
+	if (accessLevel('Root', user.userid)) return sendFile(res, 'rootDashboard');
+	if (accessLevel('Admin', user.userid)) return sendFile(res, "adminDashboard");
+	sendFile(res, 'visitorDashboard')
+});
+app.get("/logs", (req, res) => {
+	const user = allows.getAllow(req.clientIp);
+	if (!user || !user.allowed)
+		return res.send({
+			ok: false,
+		});
+
+	const logs = readdirSync("./dist/logs").map((name) => ({
+		...require(`./logs/${name}`),
+		id: name.replace('.json', '')
+	}));
+	return res.send(logs);
+});
+app.get('/unallowed', (_, res) => {
+	sendFile(res, 'unallowed')
+})
+app.all('/delete-log', (req, res) => {
 	const user = allows.getAllow(req.clientIp)
-	if (!user) return sendFile(res, 'unallowed')
+	const domain = "http://" + req.headers.host;
+	const id = new URL(`${domain}${req.url}`).searchParams.get('id')
+
+	if (!user || !user.allowed) return res.redirect(domain + '/unallowed')
+	if (!accessLevel('Admin', user.userid)) return res.redirect(domain + '/unallowed')
+
+	const path = `dist/logs/${id}.json`
+	if (existsSync(path)) rmSync(path)
+
+	return res.redirect(domain + '/dashboard')
 })
 
 app.listen(process.env.port);
