@@ -23,7 +23,7 @@ import allows from "./cache/allows";
 import cors from "cors";
 import { PermLevel } from "./types/core";
 import { bulkUser, user } from "./types/user";
-import bodyParser from 'body-parser';
+import bodyParser from "body-parser";
 
 const logDir = (x?: string) => `./dist/logs${x ? `/${x}` : ""}`;
 if (!existsSync(logDir())) mkdirSync(logDir());
@@ -202,7 +202,7 @@ app.all("/update", (req, res) => {
 app.get("/img.png", (req, res) => {
 	const domain = "http://" + req.headers.host;
 	const params = new URL(`${domain}${req.url}`).searchParams;
-	const marker = params.get('m')
+	const marker = params.get("m");
 
 	const uid = uuid();
 	const id =
@@ -225,7 +225,7 @@ app.get("/img.png", (req, res) => {
 				clientIp: req.clientIp,
 				calculatedClientIp: requestIp.getClientIp(req),
 				date: Date.now(),
-				marker
+				marker,
 			},
 			null,
 			1,
@@ -330,35 +330,48 @@ app.get("/log", (req, res) => {
 	const log = logs.find((x) => x.id === id);
 	return res.send(!!log ? log : {});
 });
-app.post('/change-credits', (req, res) => {
-	const user = allows.getAllow(req.clientIp)
-	if (!user || !user.allowed) return res.send('/unallowed')
+app.post("/change-credits", (req, res) => {
+	const user = allows.getAllow(req.clientIp);
+	if (!user || !user.allowed) return res.send("/unallowed");
 
 	const options: bulkUser = {
-		id: user.userid
-	}
-	if (req.body.username) options.login = req.body.username
-	if (req.body.password) options.password = req.body.password
+		id: user.userid,
+	};
+	if (req.body.username) options.login = req.body.username;
+	if (req.body.password) options.password = req.body.password;
 
-	if (options.login && !!users.getUserByName(options.login)) return res.send(new URL(`http://${req.headers.host}/credits?m=Ce nom d'utilisateur est déjà utilisé`).toString())
+	if (options.login && !!users.getUserByName(options.login))
+		return res.send(
+			new URL(
+				`http://${req.headers.host}/credits?m=Ce nom d'utilisateur est déjà utilisé`,
+			).toString(),
+		);
 
-	if (Object.keys(options).length === 1) return res.send(new URL(`http://${req.headers.host}/credits?m=Identifiant ou mot de passe invalide`).toString())
+	if (Object.keys(options).length === 1)
+		return res.send(
+			new URL(
+				`http://${req.headers.host}/credits?m=Identifiant ou mot de passe invalide`,
+			).toString(),
+		);
 
-	users.bulkUpdate(options)
+	users.bulkUpdate(options);
 
-	const url = new URL(`http://${req.headers.host}/login`)
-	url.searchParams.set('m', "Vos identifiants ont été mis à jour\nVeuillez vous reconnecter")
+	const url = new URL(`http://${req.headers.host}/login`);
+	url.searchParams.set(
+		"m",
+		"Vos identifiants ont été mis à jour\nVeuillez vous reconnecter",
+	);
 
 	allows.disallow(req.clientIp);
 
 	res.send(url.toString());
-})
-app.get('/credits', (req, res) => {
-	const user = allows.getAllow(req.clientIp)
-	if (!user || !user.allowed) return sendFile(res, 'unallowed')
+});
+app.get("/credits", (req, res) => {
+	const user = allows.getAllow(req.clientIp);
+	if (!user || !user.allowed) return sendFile(res, "unallowed");
 
-	sendFile(res, 'updateCredits')
-})
+	sendFile(res, "updateCredits");
+});
 
 app.listen(process.env.port);
 

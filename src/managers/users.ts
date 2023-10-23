@@ -12,46 +12,52 @@ export class UsersManager {
 	}
 
 	public bulkUpdate(datas: bulkUser) {
-		if (!datas.id) return false
-		if (!this.cache[datas.id]) return false
+		if (!datas.id) return false;
+		if (!this.cache[datas.id]) return false;
 
 		const initial = this.cache[datas.id];
-		if (datas.password) datas.password = this.hash(datas.password)
-		
-		const merged = {...initial, ...datas}
+		if (datas.password) datas.password = this.hash(datas.password);
+
+		const merged = { ...initial, ...datas };
 		this.cache[datas.id] = merged;
 
 		db.update(merged, { where: { id: datas.id } });
 	}
 	public changePassword(userId: string, password: string) {
-		if (!this.getUser(userId)) return false
+		if (!this.getUser(userId)) return false;
 
-		const hash = this.hash(password)
-		this.cache[userId].password = hash
+		const hash = this.hash(password);
+		this.cache[userId].password = hash;
 
-		db.update({
-			password: hash
-		}, {
-			where: {
-				id: userId
-			}
-		}).catch(console.log)
-		return true
+		db.update(
+			{
+				password: hash,
+			},
+			{
+				where: {
+					id: userId,
+				},
+			},
+		).catch(console.log);
+		return true;
 	}
 	public updateUsername(userId: string, name: string) {
-		if (!this.getUser(userId)) return false
-		if (this.getUserByName(name)) return false
+		if (!this.getUser(userId)) return false;
+		if (this.getUserByName(name)) return false;
 
-		this.cache[userId].login = name
+		this.cache[userId].login = name;
 
-		db.update({
-			login: name
-		}, {
-			where: {
-				id: userId
-			}
-		}).catch(console.log)
-		return true
+		db.update(
+			{
+				login: name,
+			},
+			{
+				where: {
+					id: userId,
+				},
+			},
+		).catch(console.log);
+		return true;
 	}
 	public createUser({
 		login,

@@ -43,7 +43,11 @@
 			</div>
 		</header>
 		<a class="profile" href="/credits">
-			<img src="./anonymous.webp" alt="anonymous person" class="picture">
+			<img
+				src="./anonymous.webp"
+				alt="anonymous person"
+				class="picture"
+			/>
 		</a>
 		<section>
 			<p id="errorMessage"></p>
@@ -173,11 +177,15 @@
         <p class="logIP">Adresse IP: ${log.ip}</p>
         <p class="logUseragent">Agent: ${log.headers["user-agent"]}</p>
         <p class="logDate">${date} ( ${diff} )</p>
-		${!!log.marker ? `<p class="logMarker">Marqueur: ${log.marker}</p>`:''}
+		${!!log.marker ? `<p class="logMarker">Marqueur: ${log.marker}</p>` : ""}
     </div>
     <div class="logactions">
-        <button type="submit" class="logbutton" onclick="full('${log.id}')">Complet</button>
-        <button type="submit" class="logbutton danger" onclick="deleteLog('${log.id}')">Supprimer</button>
+        <button type="submit" class="logbutton" onclick="full('${
+			log.id
+		}')">Complet</button>
+        <button type="submit" class="logbutton danger" onclick="deleteLog('${
+			log.id
+		}')">Supprimer</button>
     </div>
 </div>`;
 					})
