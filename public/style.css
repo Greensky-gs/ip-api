@@ -1,3 +1,9 @@
+:root {
+    --grey-bg: #2A2D30;
+    --dark-blue: #022b80;
+    --light-blue: #20466C;
+}
+
 button {
     background-color: inherit;
     border-radius: 5px;
@@ -13,7 +19,7 @@ button:focus, button:selection, button:hover {
 }
 
 body {
-    background-color: #20466C;
+    background-color: var(--light-blue);
     color: white;
 }
 a {

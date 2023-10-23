@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="style.css">
+		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <link rel="stylesheet" href="credits.css">
+        <title>GreenskyPI</title>
+    </head>
+    <body>
+        <header>
+            <h1>Configuration</h1>
+            <p>Modifiez vos crédits d'authentification</p>
+        </header>
+        <section class="container">
+            <div class="error_div" id="error_div">
+                <p class="message" id="message"></p>
+            </div>
+            <section class="forms">
+                <div class="form" id="username_form">
+                    <h3 class="title">Nom d'utilisateur</h3>
+                    <input placeholder="Nom d'utilisateur" type="text" name="username" id="username" class="field">
+                    <button type="submit" onclick="handle('username')" class="validation">Mettre à jour</button>
+                </div>
+                <div class="form" id="password_form">
+                    <h3 class="title">Mot de passe</h3>
+                    <input type="password" name="password" placeholder="Mot de passe" id="password" class="field">
+                    <button type="submit" class="validation" onclick="handle('password')">Mettre à jour</button>
+                </div>
+            </section>
+        </section>
+        <script type="text/javascript">
+            const req = (route) => `http://${window.location.host}/${route}`
+            const username = () => {
+                const name = document.getElementById('username')?.value
+
+                if (!name) return [false, displayMessage("Vous n'avez pas entré de nom")]
+                
+                return [true, axios.post(req('change-credits'), {
+                    username: name
+                })]
+            }
+            const password = () => {
+                const pw = document.getElementById('password')?.value
+
+                if (!pw) return [false, displayMessage("Vous n'avez entré aucun mot de passe")]
+
+                return [true, axios.post(req('change-credits'), {
+                    password: pw
+                })]
+            }
+            const handle = (location) => {
+                let returned
+
+                switch (location) {
+                    case 'username':
+                        returned = username()
+                    break;
+                    case 'password':
+                        returned = password()
+                    break;
+                }
+                if (!returned) return displayMessage('Une erreur interne a eu lieu')
+                const [valid, request] = returned
+                if (!valid) return;
+
+                request.then((res) => {
+                    window.location.href = res.data
+                })
+            }
+
+            const displayMessage = (message) => {
+			    const paragraph = document.getElementById("message");
+			    const div = document.getElementById("error_div");
+
+			    paragraph.textContent = message;
+			    div.classList.add("error_decorated");
+		    };
+
+
+		const url = new URL(window.location.href);
+		const message = url.searchParams.get("m");
+
+		if (message) displayMessage(message);
+        </script>
+    </body>
+</html>

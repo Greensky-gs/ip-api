@@ -6,3 +6,6 @@ export type user = {
 	id: string;
 	perm: PermLevel;
 };
+export type bulkUser = {
+	[K in keyof user]?: user[K]
+}

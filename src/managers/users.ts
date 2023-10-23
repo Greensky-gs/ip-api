@@ -1,4 +1,4 @@
-import { user } from "../types/user";
+import { bulkUser, user } from "../types/user";
 import { v4 as uuid } from "uuid";
 import db from "../db/models/users";
 import { createHash } from "crypto";
@@ -11,6 +11,18 @@ export class UsersManager {
 		this.start();
 	}
 
+	public bulkUpdate(datas: bulkUser) {
+		if (!datas.id) return false
+		if (!this.cache[datas.id]) return false
+
+		const initial = this.cache[datas.id];
+		if (datas.password) datas.password = this.hash(datas.password)
+		
+		const merged = {...initial, ...datas}
+		this.cache[datas.id] = merged;
+
+		db.update(merged, { where: { id: datas.id } });
+	}
 	public changePassword(userId: string, password: string) {
 		if (!this.getUser(userId)) return false
 
