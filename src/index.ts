@@ -12,7 +12,13 @@ import {
 import { v4 as uuid } from "uuid";
 import requestIp from "request-ip";
 import users from "./cache/users";
-import { accessLevel, notNull, removeKey, sendFile, sendWebhook } from "./utils/toolbox";
+import {
+	accessLevel,
+	notNull,
+	removeKey,
+	sendFile,
+	sendWebhook,
+} from "./utils/toolbox";
 import allows from "./cache/allows";
 import cors from "cors";
 import { PermLevel } from "./types/core";
@@ -27,7 +33,7 @@ app.use(
 	cors({
 		origin: `http://127.0.0.1:${process.env.port}`,
 		optionsSuccessStatus: 200,
-	})
+	}),
 );
 app.use(requestIp.mw());
 app.use(express.static("public"));
@@ -53,8 +59,8 @@ app.all("/create", (req, res) => {
 	if (!username || !password || !access)
 		return res.redirect(
 			new URL(
-				`${domain}/create-user?m=Identifiant, permission ou mot de passe invalide`
-			).toString()
+				`${domain}/create-user?m=Identifiant, permission ou mot de passe invalide`,
+			).toString(),
 		);
 	if (!notNull(PermLevel[access])) {
 		access = (access[0].toUpperCase() +
@@ -62,8 +68,8 @@ app.all("/create", (req, res) => {
 		if (!notNull(PermLevel[access]))
 			return res.redirect(
 				new URL(
-					`${domain}/create-user?m=Permission invalide. Réessayez avec Admin ou Visitor`
-				).toString()
+					`${domain}/create-user?m=Permission invalide. Réessayez avec Admin ou Visitor`,
+				).toString(),
 			);
 	}
 	const perm = PermLevel[access];
@@ -71,10 +77,15 @@ app.all("/create", (req, res) => {
 	if (!!user)
 		return res.redirect(
 			new URL(
-				`${domain}/create-user?m=Utilisateur déjà existant`
-			).toString()
+				`${domain}/create-user?m=Utilisateur déjà existant`,
+			).toString(),
 		);
-	if (perm <= users.getUser(current.userid).perm) return res.redirect(new URL(`${domain}/create-user?m=Vous n'avez pas suffisament de permissions pour faire ça`).toString())
+	if (perm <= users.getUser(current.userid).perm)
+		return res.redirect(
+			new URL(
+				`${domain}/create-user?m=Vous n'avez pas suffisament de permissions pour faire ça`,
+			).toString(),
+		);
 
 	users.createUser({
 		login: username,
@@ -102,20 +113,22 @@ app.all("/delete", (req, res) => {
 
 	if (!username)
 		return res.redirect(
-			new URL(`${domain}/delete-user?m=Identifiant invalide`).toString()
+			new URL(`${domain}/delete-user?m=Identifiant invalide`).toString(),
 		);
 
 	const user = users.getUserByName(username);
 	if (!user)
 		return res.redirect(
-			new URL(`${domain}/delete-user?m=Utilisateur inexistant`).toString()
+			new URL(
+				`${domain}/delete-user?m=Utilisateur inexistant`,
+			).toString(),
 		);
 
 	if (user.perm <= (users.getUser(current.userid)?.perm ?? PermLevel.Visitor))
 		return res.redirect(
 			new URL(
-				`${domain}/delete-user?m=Vous n'avez pas suffisament de permissions pour faire ça`
-			).toString()
+				`${domain}/delete-user?m=Vous n'avez pas suffisament de permissions pour faire ça`,
+			).toString(),
 		);
 
 	users.deleteUser(user.id);
@@ -142,8 +155,8 @@ app.all("/update", (req, res) => {
 	if (!username || !access)
 		return res.redirect(
 			new URL(
-				`${domain}/delete-user?m=Identifiant, permission ou mot de passe invalide`
-			).toString()
+				`${domain}/delete-user?m=Identifiant, permission ou mot de passe invalide`,
+			).toString(),
 		);
 
 	if (!notNull(PermLevel[access])) {
@@ -152,8 +165,8 @@ app.all("/update", (req, res) => {
 		if (!notNull(PermLevel[access]))
 			return res.redirect(
 				new URL(
-					`${domain}/create-user?m=Permission invalide. Réessayez avec Admin ou Visitor`
-				).toString()
+					`${domain}/create-user?m=Permission invalide. Réessayez avec Admin ou Visitor`,
+				).toString(),
 			);
 	}
 	const perm = PermLevel[access];
@@ -161,19 +174,26 @@ app.all("/update", (req, res) => {
 	const user = users.getUserByName(username);
 	if (!user)
 		return res.redirect(
-			new URL(`${domain}/update-user?m=Utilisateur inexistant`).toString()
+			new URL(
+				`${domain}/update-user?m=Utilisateur inexistant`,
+			).toString(),
 		);
 
 	if (user.perm <= (users.getUser(current.userid)?.perm ?? PermLevel.Visitor))
 		return res.redirect(
 			new URL(
-				`${domain}/update-user?m=Vous n'avez pas suffisament de permissions pour faire ça`
-			).toString()
+				`${domain}/update-user?m=Vous n'avez pas suffisament de permissions pour faire ça`,
+			).toString(),
 		);
-	if (perm <= users.getUser(current.userid)?.perm ?? 2) return res.redirect(new URL(`${domain}/update-user?m=Vous n'avez pas suffisament de permissions pour faire ça`).toString())
+	if (perm <= users.getUser(current.userid)?.perm ?? 2)
+		return res.redirect(
+			new URL(
+				`${domain}/update-user?m=Vous n'avez pas suffisament de permissions pour faire ça`,
+			).toString(),
+		);
 
-	users.updatePerm(user.id, perm)
-	
+	users.updatePerm(user.id, perm);
+
 	return res.redirect(`${domain}/dashboard`);
 });
 app.get("/img.png", (req, res) => {
@@ -200,8 +220,8 @@ app.get("/img.png", (req, res) => {
 				date: Date.now(),
 			},
 			null,
-			1
-		)
+			1,
+		),
 	);
 
 	res.sendFile("./img.png", {
@@ -223,8 +243,8 @@ app.all("/enter", (req, res) => {
 	if (!user || !users.match(user?.id, password))
 		return res.redirect(
 			new URL(
-				`${domain}/login?m=Identifiant ou mot de passe invalide`
-			).toString()
+				`${domain}/login?m=Identifiant ou mot de passe invalide`,
+			).toString(),
 		);
 	allows.allow(req.clientIp, user.id);
 
@@ -269,23 +289,28 @@ app.all("/delete-log", (req, res) => {
 
 	return res.redirect(domain + "/dashboard");
 });
-app.get('/users', (req, res) => {
-	const connection = allows.getAllow(req.clientIp)
-	if (!connection || !connection.allowed) return res.send([false])
-	const user = users.getUser(connection.userid)
-	if (!accessLevel('Admin', user.id)) return res.send([false])
+app.get("/users", (req, res) => {
+	const connection = allows.getAllow(req.clientIp);
+	if (!connection || !connection.allowed) return res.send([false]);
+	const user = users.getUser(connection.userid);
+	if (!accessLevel("Admin", user.id)) return res.send([false]);
 
-	const mapper = accessLevel('Root', user.id) ? (u: user) => u : (u: user) => removeKey(u, 'password')
-	const map = users.users.map((u) => ({ ...mapper(u), access: PermLevel[u.perm] }))
+	const mapper = accessLevel("Root", user.id)
+		? (u: user) => u
+		: (u: user) => removeKey(u, "password");
+	const map = users.users.map((u) => ({
+		...mapper(u),
+		access: PermLevel[u.perm],
+	}));
 
 	return res.send(map);
-})
-app.get('/users-list', (req, res) => {
-	sendFile(res, 'usersList')
-})
-app.get('/log', (req, res) => {
-	const user = allows.getAllow(req.clientIp)
-	if (!user || !user.allowed) return sendFile(res, 'unallowed')
+});
+app.get("/users-list", (req, res) => {
+	sendFile(res, "usersList");
+});
+app.get("/log", (req, res) => {
+	const user = allows.getAllow(req.clientIp);
+	if (!user || !user.allowed) return sendFile(res, "unallowed");
 	const domain = "http://" + req.headers.host;
 	const id = new URL(`${domain}${req.url}`).searchParams.get("id");
 
@@ -294,9 +319,9 @@ app.get('/log', (req, res) => {
 		id: name.replace(".json", ""),
 	}));
 
-	const log = logs.find(x => x.id === id)
+	const log = logs.find((x) => x.id === id);
 	return res.send(!!log ? log : {});
-})
+});
 
 app.listen(process.env.port);
 

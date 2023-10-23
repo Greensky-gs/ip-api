@@ -1,140 +1,206 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="style.css">
-        <link rel="stylesheet" href="dashboard.css">
-        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-        <title>GreenskyPI</title>
-    </head>
-    <body>
-        <header>
-            <h2>Dashboard</h2>
-            <div class="buttons">
-                <button type="submit" class="rootbuttons" onclick="redirect('create-user')">Créer un utilisateur</button>
-                <button type="submit" class="rootbuttons" onclick="redirect('delete-user')">Supprimer un utilisateur</button>
-                <button type="submit" class="rootbuttons" onclick="redirect('update-user')">Changer les permissions</button>
-                <button type="submit" class="rootbuttons" onclick="redirect('users-list')">Liste des utilisateurs</button>
-            </div>
-        </header>
-        <section>
-            <p id="errorMessage"></p>
-            <div class="content" id="content"></div>
-        </section>
-    </body>
-    <script type="text/javascript">
-        const baseUrl = window.location.href.split('/')[2]
-        const url = new URL(`http://${baseUrl}/logs`)
-        const errorMsg = document.getElementById('errorMessage')
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="style.css" />
+		<link rel="stylesheet" href="dashboard.css" />
+		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+		<title>GreenskyPI</title>
+	</head>
+	<body>
+		<header>
+			<h2>Dashboard</h2>
+			<div class="buttons">
+				<button
+					type="submit"
+					class="rootbuttons"
+					onclick="redirect('create-user')"
+				>
+					Créer un utilisateur
+				</button>
+				<button
+					type="submit"
+					class="rootbuttons"
+					onclick="redirect('delete-user')"
+				>
+					Supprimer un utilisateur
+				</button>
+				<button
+					type="submit"
+					class="rootbuttons"
+					onclick="redirect('update-user')"
+				>
+					Changer les permissions
+				</button>
+				<button
+					type="submit"
+					class="rootbuttons"
+					onclick="redirect('users-list')"
+				>
+					Liste des utilisateurs
+				</button>
+			</div>
+		</header>
+		<section>
+			<p id="errorMessage"></p>
+			<div class="content" id="content"></div>
+		</section>
+	</body>
+	<script type="text/javascript">
+		const baseUrl = window.location.href.split("/")[2];
+		const url = new URL(`http://${baseUrl}/logs`);
+		const errorMsg = document.getElementById("errorMessage");
 
-        const redirect = (url) => {
-            window.location.href = `http://${baseUrl}/${url}`
-        }
+		const redirect = (url) => {
+			window.location.href = `http://${baseUrl}/${url}`;
+		};
 
-        axios.get(url).then((res) => {
-            if (res.data.ok !== undefined && !res.data.ok) return errorMsg.innerHTML = `Veuillez retourner à la <a href="http://${baseUrl}/login">page de connexion</a>`;
+		axios
+			.get(url)
+			.then((res) => {
+				if (res.data.ok !== undefined && !res.data.ok)
+					return (errorMsg.innerHTML = `Veuillez retourner à la <a href="http://${baseUrl}/login">page de connexion</a>`);
 
-            const calculateTime = (x) => {
-                const diff = Date.now() - x
-                const date = new Date(x)
+				const calculateTime = (x) => {
+					const diff = Date.now() - x;
+					const date = new Date(x);
 
-                const formatDate = () => {
-                    const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-                    const day = days[date.getDay()];
+					const formatDate = () => {
+						const days = [
+							"Dimanche",
+							"Lundi",
+							"Mardi",
+							"Mercredi",
+							"Jeudi",
+							"Vendredi",
+							"Samedi",
+						];
+						const day = days[date.getDay()];
 
-                    const dayOfMonth = date.getDate();
+						const dayOfMonth = date.getDate();
 
-                    const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Jui', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
-                    const month = months[date.getMonth()];
+						const months = [
+							"Janvier",
+							"Février",
+							"Mars",
+							"Avril",
+							"Mai",
+							"Jui",
+							"Juillet",
+							"Août",
+							"Septembre",
+							"Octobre",
+							"Novembre",
+							"Décembre",
+						];
+						const month = months[date.getMonth()];
 
-                    const year = date.getFullYear();
+						const year = date.getFullYear();
 
-                    const hours = date.getHours();
-                    const minutes = date.getMinutes();
-                    const seconds = date.getSeconds();
+						const hours = date.getHours();
+						const minutes = date.getMinutes();
+						const seconds = date.getSeconds();
 
-                    const formattedDate = `${day} ${dayOfMonth} ${month} ${year} à ${hours}:${minutes}:${seconds}`;
+						const formattedDate = `${day} ${dayOfMonth} ${month} ${year} à ${hours}:${minutes}:${seconds}`;
 
-                    return formattedDate
-                }
-                const formatUnix = () => {
-                    const weeks = Math.floor(diff / (1000 * 60 * 60 * 24 * 7));
-                    const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 7)) / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+						return formattedDate;
+					};
+					const formatUnix = () => {
+						const weeks = Math.floor(
+							diff / (1000 * 60 * 60 * 24 * 7),
+						);
+						const days = Math.floor(
+							(diff % (1000 * 60 * 60 * 24 * 7)) /
+								(1000 * 60 * 60 * 24),
+						);
+						const hours = Math.floor(
+							(diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+						);
+						const minutes = Math.floor(
+							(diff % (1000 * 60 * 60)) / (1000 * 60),
+						);
+						const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-                    const values = [];
-                        [
-                            { x: weeks, y: 'semaines' },
-                            { x: days, y: 'jours' },
-                            { x: hours, y: 'heures' },
-                            { x: minutes, y: 'minutes' },
-                            { x: seconds, y: 'secondes' }
-                        ]
-                            .filter((x) => x.x > 0)
-                            .forEach((x) => {
-                                values.push(`${x.x} ${x.x === 1 ? x.y.substring(0, x.y.length - 1) : x.y}`);
-                            });
-                    
-                    let res = ''
-                    values.forEach((v, i) => {
-                        res += `${v}`;
-                        const next = values[i + 1];
-                        if (!next) return;
-                        const dnext = values[i + 2];
-                        let sep = dnext ? ',' : ' ' + 'et';
-                        res += sep + ' ';
-                    });
+						const values = [];
+						[
+							{ x: weeks, y: "semaines" },
+							{ x: days, y: "jours" },
+							{ x: hours, y: "heures" },
+							{ x: minutes, y: "minutes" },
+							{ x: seconds, y: "secondes" },
+						]
+							.filter((x) => x.x > 0)
+							.forEach((x) => {
+								values.push(
+									`${x.x} ${
+										x.x === 1
+											? x.y.substring(0, x.y.length - 1)
+											: x.y
+									}`,
+								);
+							});
 
-                    return res
-                }
+						let res = "";
+						values.forEach((v, i) => {
+							res += `${v}`;
+							const next = values[i + 1];
+							if (!next) return;
+							const dnext = values[i + 2];
+							let sep = dnext ? "," : " " + "et";
+							res += sep + " ";
+						});
 
-                return {
-                    diff: formatUnix(),
-                    date: formatDate()
-                }
-            }
+						return res;
+					};
 
-            const div = document.getElementById('content')
-            const text = res.data.map((log) => {
-                const { diff, date } = calculateTime(log.date)
+					return {
+						diff: formatUnix(),
+						date: formatDate(),
+					};
+				};
 
-                return `<div class="log">
+				const div = document.getElementById("content");
+				const text = res.data
+					.map((log) => {
+						const { diff, date } = calculateTime(log.date);
+
+						return `<div class="log">
     <div class="loginfos">
         <p class="logIP">Adresse IP: ${log.ip}</p>
-        <p class="logUseragent">Agent: ${log.headers['user-agent']}</p>
+        <p class="logUseragent">Agent: ${log.headers["user-agent"]}</p>
         <p class="logDate">${date} ( ${diff} )</p>
     </div>
     <div class="logactions">
         <button type="submit" class="logbutton" onclick="full('${log.id}')">Complet</button>
         <button type="submit" class="logbutton danger" onclick="deleteLog('${log.id}')">Supprimer</button>
     </div>
-</div>`
-            }).join('\n')
+</div>`;
+					})
+					.join("\n");
 
-            div.innerHTML = text
-        }).catch(err => {
-            errorMsg.innerText = err
-        })
+				div.innerHTML = text;
+			})
+			.catch((err) => {
+				errorMsg.innerText = err;
+			});
 
-        const full = (id) => {
-            const fetchUrl = new URL(`http://${baseUrl}/log`)
-            fetchUrl.searchParams.set('id', id)
+		const full = (id) => {
+			const fetchUrl = new URL(`http://${baseUrl}/log`);
+			fetchUrl.searchParams.set("id", id);
 
-            window.location.href = fetchUrl.toString()
-        }
-        const deleteLog = (logId) => {
-            const confirmation = confirm(`Êtes-vous sûr de supprimer ce log ?`)
-            if (!confirmation) return
+			window.location.href = fetchUrl.toString();
+		};
+		const deleteLog = (logId) => {
+			const confirmation = confirm(`Êtes-vous sûr de supprimer ce log ?`);
+			if (!confirmation) return;
 
-            const fetchUrl = new URL(`http://${baseUrl}/delete-log`)
-            fetchUrl.searchParams.set('id', logId)
+			const fetchUrl = new URL(`http://${baseUrl}/delete-log`);
+			fetchUrl.searchParams.set("id", logId);
 
-            fetch(fetchUrl, { method: 'POST' }).then((res) => {
-                window.location.href = res.url
-            })
-        }
-    </script>
+			fetch(fetchUrl, { method: "POST" }).then((res) => {
+				window.location.href = res.url;
+			});
+		};
+	</script>
 </html>

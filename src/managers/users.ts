@@ -14,31 +14,31 @@ export class UsersManager {
 	public createUser({
 		login,
 		password,
-		perm
+		perm,
 	}: {
 		login: string;
 		password: string;
-		perm: PermLevel | keyof typeof PermLevel
+		perm: PermLevel | keyof typeof PermLevel;
 	}) {
 		if (this.users.find((x) => x.login === login))
 			return "username already taken";
 		const id = uuid();
 
-		const permission = typeof perm === 'number' ? perm : PermLevel[perm]
+		const permission = typeof perm === "number" ? perm : PermLevel[perm];
 
 		const hashed = this.hash(password);
 		this.cache[id] = {
 			id,
 			login,
 			password: hashed,
-			perm: permission
+			perm: permission,
 		};
 
 		db.create({
 			login,
 			password: hashed,
 			id,
-			perm: permission
+			perm: permission,
 		}).catch((err) => console.log(err));
 	}
 	public getUser(id: string) {
@@ -54,30 +54,33 @@ export class UsersManager {
 		return this.hash(input) === password;
 	}
 	public getUserByName(name: string) {
-		return this.users.find(x => x.login === name)
+		return this.users.find((x) => x.login === name);
 	}
 	public deleteUser(userId: string) {
-		const has = !!this.cache[userId]
-		if (has) delete this.cache[userId]
+		const has = !!this.cache[userId];
+		if (has) delete this.cache[userId];
 
 		db.destroy({
 			where: {
-				id: userId
-			}
-		}).catch(console.log)
-		return has
+				id: userId,
+			},
+		}).catch(console.log);
+		return has;
 	}
 	public updatePerm(userId: string, access: PermLevel) {
-		const has = !!this.cache[userId]
-		if (has) this.cache[userId].perm = access
+		const has = !!this.cache[userId];
+		if (has) this.cache[userId].perm = access;
 
-		db.update({
-			perm: access
-		}, {
-			where: {
-				id: userId
-			}
-		})
+		db.update(
+			{
+				perm: access,
+			},
+			{
+				where: {
+					id: userId,
+				},
+			},
+		);
 	}
 
 	private hash(str: string) {

@@ -36,9 +36,11 @@ export class Allow {
 			})
 			.then(([m, u]) => {
 				if (!u)
-					m.update({ allowed: true, allowedAt: allowDate, userid: userid }).catch(
-						console.log
-					);
+					m.update({
+						allowed: true,
+						allowedAt: allowDate,
+						userid: userid,
+					}).catch(console.log);
 			});
 	}
 	public disallow(ip: string) {

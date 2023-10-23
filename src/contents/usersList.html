@@ -1,42 +1,44 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <link rel="stylesheet" href="style.css">
-        <link rel="stylesheet" href="users.css">
-        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-        <title>GreenskyPI</title>
-    </head>
-    <body>
-        <section>
-            <h1>Utilisateurs</h1>
-        </section>
-        <div class="container">
-            <p class="errorMessage" id="errorMessage"></p>
-            <div class="users" id="users"></div>
-        </div>
-    </body>
-    <script type="text/javascript">
-        const errorMsg = document.getElementById('errorMessage')
-        const usersDiv = document.getElementById('users')
-        const baseUrl = window.location.href.split('/')[2]
-        const url = new URL(`http://${baseUrl}`)
+	<head>
+		<meta charset="UTF-8" />
+		<link rel="stylesheet" href="style.css" />
+		<link rel="stylesheet" href="users.css" />
+		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+		<title>GreenskyPI</title>
+	</head>
+	<body>
+		<section>
+			<h1>Utilisateurs</h1>
+		</section>
+		<div class="container">
+			<p class="errorMessage" id="errorMessage"></p>
+			<div class="users" id="users"></div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		const errorMsg = document.getElementById("errorMessage");
+		const usersDiv = document.getElementById("users");
+		const baseUrl = window.location.href.split("/")[2];
+		const url = new URL(`http://${baseUrl}`);
 
-        axios.get(url.toString() + 'users').then((res) => {
-            if (res.data.length === 1 && !res.data[0]) {
-                return window.location.href = url + '/unallowed'
-            }
+		axios.get(url.toString() + "users").then((res) => {
+			if (res.data.length === 1 && !res.data[0]) {
+				return (window.location.href = url + "/unallowed");
+			}
 
-            const text = res.data.map((user) => {
-                return `<div class="user">
+			const text = res.data
+				.map((user) => {
+					return `<div class="user">
     <p class="userName">Nom d'utilisateur : ${user.login}</p>
-    <p class="userAccess">Permissions : ${user.access}</p>${!!user.password ?
-    `<p class="userpassword">${user.password}</p>`
-: ''}
-</div>`
-            }).join('')
+    <p class="userAccess">Permissions : ${user.access}</p>${
+		!!user.password ? `<p class="userpassword">${user.password}</p>` : ""
+	}
+</div>`;
+				})
+				.join("");
 
-            usersDiv.innerHTML = text
-        })
-    </script>
+			usersDiv.innerHTML = text;
+		});
+	</script>
 </html>
