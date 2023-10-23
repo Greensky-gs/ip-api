@@ -136,6 +136,7 @@
         <p class="logIP">Adresse IP: ${log.ip}</p>
         <p class="logUseragent">Agent: ${log.headers["user-agent"]}</p>
         <p class="logDate">${date} ( ${diff} )</p>
+		${!!log.marker ? `<p class="logMarker">Marqueur: ${log.marker}</p>`:''}
     </div>
     <div class="logactions">
         <button type="submit" class="logbutton" onclick="full('${log.id}')">Complet</button>

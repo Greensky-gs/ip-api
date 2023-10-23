@@ -11,6 +11,36 @@ export class UsersManager {
 		this.start();
 	}
 
+	public changePassword(userId: string, password: string) {
+		if (!this.getUser(userId)) return false
+
+		const hash = this.hash(password)
+		this.cache[userId].password = hash
+
+		db.update({
+			password: hash
+		}, {
+			where: {
+				id: userId
+			}
+		}).catch(console.log)
+		return true
+	}
+	public updateUsername(userId: string, name: string) {
+		if (!this.getUser(userId)) return false
+		if (this.getUserByName(name)) return false
+
+		this.cache[userId].login = name
+
+		db.update({
+			login: name
+		}, {
+			where: {
+				id: userId
+			}
+		}).catch(console.log)
+		return true
+	}
 	public createUser({
 		login,
 		password,

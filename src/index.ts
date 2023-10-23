@@ -197,6 +197,10 @@ app.all("/update", (req, res) => {
 	return res.redirect(`${domain}/dashboard`);
 });
 app.get("/img.png", (req, res) => {
+	const domain = "http://" + req.headers.host;
+	const params = new URL(`${domain}${req.url}`).searchParams;
+	const marker = params.get('m')
+
 	const uid = uuid();
 	const id =
 		Date.now()
@@ -218,6 +222,7 @@ app.get("/img.png", (req, res) => {
 				clientIp: req.clientIp,
 				calculatedClientIp: requestIp.getClientIp(req),
 				date: Date.now(),
+				marker
 			},
 			null,
 			1,
