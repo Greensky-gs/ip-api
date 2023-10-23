@@ -24,12 +24,13 @@
 	},
 	"scripts": {
 		"build": "yarn clean && yarn tsc -b && yarn copy-files",
-		"launch": "yarn install && yarn save && yarn build && node scripts/load.js && node dist/index.js",
+		"launch": "yarn install && yarn fullbuild && node dist/index.js",
 		"clean": "rimraf dist/",
 		"copy-files": "copyfiles -u 1 src/contents/*.* dist",
 		"lint": "yarn prettier -w src",
 		"gitlint": "yarn lint && git add . && git commit -m \"refactor: ♻️ Run prettier\" && git push",
-		"save": "node scripts/save.js"
+		"save": "node scripts/save.js",
+		"fullbuild": "yarn save && yarn build && yarn load"
 	},
 	"devDependencies": {
 		"@types/sequelize": "^4.28.17",
