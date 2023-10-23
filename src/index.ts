@@ -280,7 +280,7 @@ app.get("/logs", (req, res) => {
 	const logs = readdirSync("./dist/logs").map((name) => ({
 		...require(`./logs/${name}`),
 		id: name.replace(".json", ""),
-	}));
+	})).sort((a, b) => b.date - a.date);
 	return res.send(logs);
 });
 app.get("/unallowed", (_, res) => {
