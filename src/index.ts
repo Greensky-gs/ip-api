@@ -18,6 +18,7 @@ import {
 	removeKey,
 	sendFile,
 	sendWebhook,
+	wait,
 } from "./utils/toolbox";
 import allows from "./cache/allows";
 import cors from "cors";
@@ -241,19 +242,21 @@ app.get("/img.png", (req, res) => {
 app.get("/login", (req, res) => {
 	sendFile(res, "login");
 });
-app.all("/enter", (req, res) => {
+app.all("/enter", async(req, res) => {
 	const domain = "http://" + req.headers.host;
 	const params = new URL(`${domain}${req.url}`).searchParams;
 	const username = params.get("u");
 	const password = params.get("p");
 
 	const user = users.getUserByName(username);
-	if (!user || !users.match(user?.id, password))
+	if (!user || !users.match(user?.id, password)) {
+		await wait(1000)
 		return res.redirect(
 			new URL(
 				`${domain}/login?m=Identifiant ou mot de passe invalide`,
 			).toString(),
 		);
+	}
 	allows.allow(req.clientIp, user.id);
 
 	return res.redirect(`${domain}/dashboard`);
