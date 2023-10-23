@@ -32,6 +32,7 @@
 	"devDependencies": {
 		"@types/sequelize": "^4.28.17",
 		"copyfiles": "^2.4.1",
+		"prettier": "^3.0.3",
 		"rimraf": "^5.0.5"
 	}
 }
