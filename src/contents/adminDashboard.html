@@ -12,6 +12,9 @@
 		<header>
 			<h2>Dashboard</h2>
 		</header>
+		<a class="profile" href="/credits">
+			<img src="./anonymous.webp" alt="anonymous person" class="picture">
+		</a>
 		<section>
 			<p id="errorMessage"></p>
 			<div class="content" id="content"></div>
@@ -140,7 +143,7 @@
     </div>
     <div class="logactions">
         <button type="submit" class="logbutton" onclick="full('${log.id}')">Complet</button>
-        <button type="submit" class="logbutton" onclick="deleteLog('${log.id}')" class="danger">Supprimer</button>
+        <button type="submit" class="logbutton danger" onclick="deleteLog('${log.id}')">Supprimer</button>
     </div>
 </div>`;
 					})

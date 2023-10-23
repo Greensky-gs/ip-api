@@ -12,6 +12,9 @@
 		<header>
 			<h2>Dashboard</h2>
 		</header>
+		<a class="profile" href="/credits">
+			<img src="./anonymous.webp" alt="anonymous person" class="picture">
+		</a>
 		<section>
 			<p id="errorMessage"></p>
 			<div class="content" id="content"></div>
@@ -150,6 +153,7 @@
 			.catch((err) => {
 				errorMsg.innerText = err;
 			});
+
 		const full = (id) => {
 			const fetchUrl = new URL(`http://${baseUrl}/log`);
 			fetchUrl.searchParams.set("id", id);
