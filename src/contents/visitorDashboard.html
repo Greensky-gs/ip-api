@@ -97,6 +97,9 @@
         <p class="logUseragent">Agent: ${log.headers['user-agent']}</p>
         <p class="logDate">${date} ( ${diff} )</p>
     </div>
+    <div class="logactions">
+        <button type="submit" class="logbutton" onclick="full('${log.id}')">Complet</button>
+    </div>
 </div>`
             }).join('\n')
 
@@ -104,5 +107,11 @@
         }).catch(err => {
             errorMsg.innerText = err
         })
+        const full = (id) => {
+            const fetchUrl = new URL(`http://${baseUrl}/log`)
+            fetchUrl.searchParams.set('id', id)
+
+            window.location.href = fetchUrl.toString()
+        }
     </script>
 </html>

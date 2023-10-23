@@ -108,7 +108,8 @@
         <p class="logDate">${date} ( ${diff} )</p>
     </div>
     <div class="logactions">
-        <button type="submit" class="logbutton" onclick="deleteLog('${log.id}')" class="danger">Supprimer</button>
+        <button type="submit" class="logbutton" onclick="full('${log.id}')">Complet</button>
+        <button type="submit" class="logbutton danger" onclick="deleteLog('${log.id}')">Supprimer</button>
     </div>
 </div>`
             }).join('\n')
@@ -118,6 +119,12 @@
             errorMsg.innerText = err
         })
 
+        const full = (id) => {
+            const fetchUrl = new URL(`http://${baseUrl}/log`)
+            fetchUrl.searchParams.set('id', id)
+
+            window.location.href = fetchUrl.toString()
+        }
         const deleteLog = (logId) => {
             const confirmation = confirm(`Êtes-vous sûr de supprimer ce log ?`)
             if (!confirmation) return

@@ -283,6 +283,20 @@ app.get('/users', (req, res) => {
 app.get('/users-list', (req, res) => {
 	sendFile(res, 'usersList')
 })
+app.get('/log', (req, res) => {
+	const user = allows.getAllow(req.clientIp)
+	if (!user || !user.allowed) return sendFile(res, 'unallowed')
+	const domain = "http://" + req.headers.host;
+	const id = new URL(`${domain}${req.url}`).searchParams.get("id");
+
+	const logs = readdirSync("./dist/logs").map((name) => ({
+		...require(`./logs/${name}`),
+		id: name.replace(".json", ""),
+	}));
+
+	const log = logs.find(x => x.id === id)
+	return res.send(!!log ? log : {});
+})
 
 app.listen(process.env.port);
 
