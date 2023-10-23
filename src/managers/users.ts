@@ -56,6 +56,29 @@ export class UsersManager {
 	public getUserByName(name: string) {
 		return this.users.find(x => x.login === name)
 	}
+	public deleteUser(userId: string) {
+		const has = !!this.cache[userId]
+		if (has) delete this.cache[userId]
+
+		db.destroy({
+			where: {
+				id: userId
+			}
+		}).catch(console.log)
+		return has
+	}
+	public updatePerm(userId: string, access: PermLevel) {
+		const has = !!this.cache[userId]
+		if (has) this.cache[userId].perm = access
+
+		db.update({
+			perm: access
+		}, {
+			where: {
+				id: userId
+			}
+		})
+	}
 
 	private hash(str: string) {
 		const hash = createHash("sha256");

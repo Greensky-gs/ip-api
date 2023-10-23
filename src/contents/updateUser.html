@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport">
+        <title>GreenskyPI</title>
+        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="login.css">
+    </head>
+    <body>
+        <div class="container">
+            <div class="form">
+                <div class="title">GreenskyPI</div>
+                <input placeholder="username" type="text" name="username" id="username" class="field">
+                <input placeholder="permission" type="text" name="permission" id="permission" class="field">
+                <button type="submit" id="login-button" class=".button" onclick="login()">Mise à jour</button>
+            </div>
+            <div class="error" id="error_div">
+                <p id="errorMessage"></p>
+            </div>
+        </div>
+    </body>
+    <script type="text/javascript">
+        const login = () => {
+            const username = document.getElementById('username')?.value
+            const perm = document.getElementById('permission')?.value
+
+            const baseUrl = window.location.href.split('/')[2]
+            const url = new URL(`http://${baseUrl}/update`)
+            url.searchParams.set('u', username)
+            url.searchParams.set('a', perm)
+
+            fetch(url, {
+                method: 'POST'
+            }).then((res) => {
+                window.location.href = res.url;
+            })
+        }
+        const displayMessage = (message) => {
+            const paragraph = document.getElementById('errorMessage')
+            const div = document.getElementById('error_div')
+
+            paragraph.textContent = message
+            div.classList.add('error_decorated')
+        }
+        
+        document.addEventListener('keypress', (key) => {
+            if (key.code === 13) login()
+        })
+
+        const url = new URL(window.location.href)
+        const message = url.searchParams.get('m')
+
+        if (message) displayMessage(message)
+    </script>
+</html>

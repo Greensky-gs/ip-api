@@ -14,7 +14,8 @@
             <div class="buttons">
                 <button type="submit" class="rootbuttons" onclick="redirect('create-user')">Créer un utilisateur</button>
                 <button type="submit" class="rootbuttons" onclick="redirect('delete-user')">Supprimer un utilisateur</button>
-                <button type="submit" class="rootbuttons" onclick="redirect('edit-perms')">Changer les permissions</button>
+                <button type="submit" class="rootbuttons" onclick="redirect('update-user')">Changer les permissions</button>
+                <button type="submit" class="rootbuttons" onclick="redirect('users-list')">Liste des utilisateurs</button>
             </div>
         </header>
         <section>
@@ -28,7 +29,7 @@
         const errorMsg = document.getElementById('errorMessage')
 
         const redirect = (url) => {
-            window.href.location = `http://${baseUrl}/${url}`
+            window.location.href = `http://${baseUrl}/${url}`
         }
 
         axios.get(url).then((res) => {

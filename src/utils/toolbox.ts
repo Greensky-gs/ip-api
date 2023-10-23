@@ -23,3 +23,8 @@ export const accessLevel = (perm: keyof typeof PermLevel, userId: string) => {
     const user = users.getUser(userId)
     return (user?.perm ?? PermLevel.Visitor) <= PermLevel[perm]
 }
+export const notNull = (x: any) => ![undefined, null, ''].includes(x)
+export const removeKey = <T, K extends keyof T>(obj: T, key: K): Omit<T, K> => {
+    const { [key]: _, ...rest } = obj;
+    return rest;
+};

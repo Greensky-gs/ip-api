@@ -2,13 +2,21 @@ import express from "express";
 import { config } from "dotenv";
 config();
 
-import { writeFileSync, existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
+import {
+	writeFileSync,
+	existsSync,
+	mkdirSync,
+	readdirSync,
+	rmSync,
+} from "node:fs";
 import { v4 as uuid } from "uuid";
 import requestIp from "request-ip";
 import users from "./cache/users";
-import { accessLevel, sendFile, sendWebhook } from "./utils/toolbox";
+import { accessLevel, notNull, removeKey, sendFile, sendWebhook } from "./utils/toolbox";
 import allows from "./cache/allows";
 import cors from "cors";
+import { PermLevel } from "./types/core";
+import { user } from "./types/user";
 
 const logDir = (x?: string) => `./dist/logs${x ? `/${x}` : ""}`;
 if (!existsSync(logDir())) mkdirSync(logDir());
@@ -24,6 +32,150 @@ app.use(
 app.use(requestIp.mw());
 app.use(express.static("public"));
 
+app.get("/create-user", (req, res) => {
+	const user = allows.getAllow(req.clientIp);
+	if (!user || !user.allowed || !accessLevel("Root", user.userid))
+		return sendFile(res, "unallowed");
+
+	sendFile(res, "createUser");
+});
+app.all("/create", (req, res) => {
+	const domain = "http://" + req.headers.host;
+	const current = allows.getAllow(req.clientIp);
+	if (!accessLevel("Root", current.userid))
+		return res.redirect(`${domain}/unalowed`);
+
+	const params = new URL(`${domain}${req.url}`).searchParams;
+	const username = params.get("u");
+	const password = params.get("p");
+	let access = params.get("a") as keyof typeof PermLevel;
+
+	if (!username || !password || !access)
+		return res.redirect(
+			new URL(
+				`${domain}/create-user?m=Identifiant, permission ou mot de passe invalide`
+			).toString()
+		);
+	if (!notNull(PermLevel[access])) {
+		access = (access[0].toUpperCase() +
+			access.slice(1)) as keyof typeof PermLevel;
+		if (!notNull(PermLevel[access]))
+			return res.redirect(
+				new URL(
+					`${domain}/create-user?m=Permission invalide. Réessayez avec Admin ou Visitor`
+				).toString()
+			);
+	}
+	const perm = PermLevel[access];
+	const user = users.getUserByName(username);
+	if (!!user)
+		return res.redirect(
+			new URL(
+				`${domain}/create-user?m=Utilisateur déjà existant`
+			).toString()
+		);
+	if (perm <= users.getUser(current.userid).perm) return res.redirect(new URL(`${domain}/create-user?m=Vous n'avez pas suffisament de permissions pour faire ça`).toString())
+
+	users.createUser({
+		login: username,
+		password: password,
+		perm: perm,
+	});
+
+	return res.redirect(`${domain}/dashboard`);
+});
+app.get("/delete-user", (req, res) => {
+	const user = allows.getAllow(req.clientIp);
+	if (!user || !user.allowed || !accessLevel("Root", user.userid))
+		return sendFile(res, "unallowed");
+
+	sendFile(res, "deleteUser");
+});
+app.all("/delete", (req, res) => {
+	const domain = "http://" + req.headers.host;
+	const current = allows.getAllow(req.clientIp);
+	if (!accessLevel("Root", current.userid))
+		return res.redirect(`${domain}/unalowed`);
+
+	const params = new URL(`${domain}${req.url}`).searchParams;
+	const username = params.get("u");
+
+	if (!username)
+		return res.redirect(
+			new URL(`${domain}/delete-user?m=Identifiant invalide`).toString()
+		);
+
+	const user = users.getUserByName(username);
+	if (!user)
+		return res.redirect(
+			new URL(`${domain}/delete-user?m=Utilisateur inexistant`).toString()
+		);
+
+	if (user.perm <= (users.getUser(current.userid)?.perm ?? PermLevel.Visitor))
+		return res.redirect(
+			new URL(
+				`${domain}/delete-user?m=Vous n'avez pas suffisament de permissions pour faire ça`
+			).toString()
+		);
+
+	users.deleteUser(user.id);
+
+	return res.redirect(`${domain}/dashboard`);
+});
+app.get("/update-user", (req, res) => {
+	const user = allows.getAllow(req.clientIp);
+	if (!user || !user.allowed || !accessLevel("Root", user.userid))
+		return sendFile(res, "unallowed");
+
+	sendFile(res, "updateUser");
+});
+app.all("/update", (req, res) => {
+	const domain = "http://" + req.headers.host;
+	const current = allows.getAllow(req.clientIp);
+	if (!accessLevel("Root", current.userid))
+		return res.redirect(`${domain}/unalowed`);
+
+	const params = new URL(`${domain}${req.url}`).searchParams;
+	const username = params.get("u");
+	let access = params.get("a") as keyof typeof PermLevel;
+
+	if (!username || !access)
+		return res.redirect(
+			new URL(
+				`${domain}/delete-user?m=Identifiant, permission ou mot de passe invalide`
+			).toString()
+		);
+
+	if (!notNull(PermLevel[access])) {
+		access = (access[0].toUpperCase() +
+			access.slice(1)) as keyof typeof PermLevel;
+		if (!notNull(PermLevel[access]))
+			return res.redirect(
+				new URL(
+					`${domain}/create-user?m=Permission invalide. Réessayez avec Admin ou Visitor`
+				).toString()
+			);
+	}
+	const perm = PermLevel[access];
+
+	const user = users.getUserByName(username);
+	if (!user)
+		return res.redirect(
+			new URL(`${domain}/update-user?m=Utilisateur inexistant`).toString()
+		);
+
+	if (user.perm <= (users.getUser(current.userid)?.perm ?? PermLevel.Visitor))
+		return res.redirect(
+			new URL(
+				`${domain}/update-user?m=Vous n'avez pas suffisament de permissions pour faire ça`
+			).toString()
+		);
+	if (perm <= users.getUser(current.userid)?.perm ?? 2) return res.redirect(new URL(`${domain}/update-user?m=Vous n'avez pas suffisament de permissions pour faire ça`).toString())
+
+	users.updatePerm(user.id, perm)
+	
+	return res.redirect(`${domain}/dashboard`);
+});
 app.get("/img.png", (req, res) => {
 	const uid = uuid();
 	const id =
@@ -45,7 +197,7 @@ app.get("/img.png", (req, res) => {
 				query: req.query,
 				clientIp: req.clientIp,
 				calculatedClientIp: requestIp.getClientIp(req),
-				date: Date.now()
+				date: Date.now(),
 			},
 			null,
 			1
@@ -82,9 +234,10 @@ app.get("/dashboard", (req, res) => {
 	const user = allows.getAllow(req.clientIp);
 	if (!user || !user.allowed) return sendFile(res, "unallowed");
 
-	if (accessLevel('Root', user.userid)) return sendFile(res, 'rootDashboard');
-	if (accessLevel('Admin', user.userid)) return sendFile(res, "adminDashboard");
-	sendFile(res, 'visitorDashboard')
+	if (accessLevel("Root", user.userid)) return sendFile(res, "rootDashboard");
+	if (accessLevel("Admin", user.userid))
+		return sendFile(res, "adminDashboard");
+	sendFile(res, "visitorDashboard");
 });
 app.get("/logs", (req, res) => {
 	const user = allows.getAllow(req.clientIp);
@@ -95,25 +248,40 @@ app.get("/logs", (req, res) => {
 
 	const logs = readdirSync("./dist/logs").map((name) => ({
 		...require(`./logs/${name}`),
-		id: name.replace('.json', '')
+		id: name.replace(".json", ""),
 	}));
 	return res.send(logs);
 });
-app.get('/unallowed', (_, res) => {
-	sendFile(res, 'unallowed')
-})
-app.all('/delete-log', (req, res) => {
-	const user = allows.getAllow(req.clientIp)
+app.get("/unallowed", (_, res) => {
+	sendFile(res, "unallowed");
+});
+app.all("/delete-log", (req, res) => {
+	const user = allows.getAllow(req.clientIp);
 	const domain = "http://" + req.headers.host;
-	const id = new URL(`${domain}${req.url}`).searchParams.get('id')
+	const id = new URL(`${domain}${req.url}`).searchParams.get("id");
 
-	if (!user || !user.allowed) return res.redirect(domain + '/unallowed')
-	if (!accessLevel('Admin', user.userid)) return res.redirect(domain + '/unallowed')
+	if (!user || !user.allowed) return res.redirect(domain + "/unallowed");
+	if (!accessLevel("Admin", user.userid))
+		return res.redirect(domain + "/unallowed");
 
-	const path = `dist/logs/${id}.json`
-	if (existsSync(path)) rmSync(path)
+	const path = `dist/logs/${id}.json`;
+	if (existsSync(path)) rmSync(path);
 
-	return res.redirect(domain + '/dashboard')
+	return res.redirect(domain + "/dashboard");
+});
+app.get('/users', (req, res) => {
+	const connection = allows.getAllow(req.clientIp)
+	if (!connection || !connection.allowed) return res.send([false])
+	const user = users.getUser(connection.userid)
+	if (!accessLevel('Admin', user.id)) return res.send([false])
+
+	const mapper = accessLevel('Root', user.id) ? (u: user) => u : (u: user) => removeKey(u, 'password')
+	const map = users.users.map((u) => ({ ...mapper(u), access: PermLevel[u.perm] }))
+
+	return res.send(map);
+})
+app.get('/users-list', (req, res) => {
+	sendFile(res, 'usersList')
 })
 
 app.listen(process.env.port);
