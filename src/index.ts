@@ -242,7 +242,7 @@ app.get("/img.png", (req, res) => {
 app.get("/login", (req, res) => {
 	sendFile(res, "login");
 });
-app.all("/enter", async(req, res) => {
+app.all("/enter", async (req, res) => {
 	const domain = "http://" + req.headers.host;
 	const params = new URL(`${domain}${req.url}`).searchParams;
 	const username = params.get("u");
@@ -250,7 +250,7 @@ app.all("/enter", async(req, res) => {
 
 	const user = users.getUserByName(username);
 	if (!user || !users.match(user?.id, password)) {
-		await wait(1000)
+		await wait(1000);
 		return res.redirect(
 			new URL(
 				`${domain}/login?m=Identifiant ou mot de passe invalide`,

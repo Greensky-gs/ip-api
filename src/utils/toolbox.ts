@@ -35,9 +35,9 @@ export const removeKey = <T, K extends keyof T>(obj: T, key: K): Omit<T, K> => {
 	return rest;
 };
 export const wait = (ms: number): Promise<true> => {
-	return new Promise(resolve => {
+	return new Promise((resolve) => {
 		setTimeout(() => {
-			resolve(true)
-		}, ms)
-	})
-}
+			resolve(true);
+		}, ms);
+	});
+};
